@@ -1,0 +1,52 @@
+--1
+select vp.* from Operation op , Health_Worker hw, Health_Place hp,Citizen vp
+where op.vaccination_date>'16-06-2021' and hp.Place_id=hw.Place_id 
+and hw.Worker_Id=op.Worker_Id and vp.Citizen_id=op.Citizen_id
+and (hp.Place_city like 'G%' or hp.Place_city like 'V%')
+
+-- 2
+select hw.name,hw.surname from Health_Worker hw , Operation op, Citizen c
+where c.Citizen_id=op.Citizen_id and hw.Worker_Id=op.Worker_Id
+and c.age>50
+
+-- 3 
+alter table Vaccine
+add  Country_Code varchar(10) ;
+
+-- 4 
+select vaccine_name , count(*) Citizen_count from Vaccine v, Operation op, Citizen c
+where c.Citizen_id=op.Citizen_id and v.vaccine_id=op.vaccine_id
+group by vaccine_name
+
+
+-- 5
+select  * from Citizen  
+where age=(select min (age) from Vaccine v, Operation op, Citizen c , Health_Place hp
+where c.Citizen_id=op.Citizen_id and v.vaccine_id=op.vaccine_id 
+and hp.Place_Name='Dokuz Eylül University Hospital' and 
+vaccine_name='Sinovac');
+
+-- 6 
+select vaccine_name,vaccination_date , Place_Name 
+from Vaccine v, Operation op, Citizen c, Health_Place hp , Health_Worker hw
+where c.Citizen_id=op.Citizen_id and v.vaccine_id=op.vaccine_id and c.Name||' '||c.Surname='Ali Aslan'
+and hp.Place_id=hw.Place_id and hw.Worker_Id=op.Worker_Id;
+
+-- 7
+select  city from Citizen c , Application a
+where a.Citizen_id=c.Citizen_id and state_of_health='risky'
+group by city
+order by  count(state_of_health) desc  limit 1;
+
+--8
+update Application
+set state_of_health='risky'
+where Phone_number='05534849876';
+
+-- 9 
+delete from Citizen
+where age>65 and Citizen_id not in (select c.Citizen_id from Citizen c,Operation op 
+                                   where c.Citizen_id=op.Citizen_id);
+-- 10
+insert into Vaccine
+values(3,'Sputnik V','Russia','RU');
